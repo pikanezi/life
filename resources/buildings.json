@@ -1,0 +1,13 @@
+[
+  {
+    "id": "farm",
+    "build_effects": [
+      {
+        "kind": "production",
+        "operation": "additive",
+        "target": ["resource", "food"],
+        "magnitude": 1
+      }
+    ]
+  }
+]

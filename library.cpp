@@ -15,3 +15,7 @@ void start_simulation() {
 void stop_simulation() {
     game->stop_simulation();
 }
+
+void load_buildings(const char* file_path) {
+    game->load_buildings(file_path);
+}

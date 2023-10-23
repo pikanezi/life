@@ -7,30 +7,34 @@
 
 #include <chrono>
 #include <memory>
+#include <string>
+
+#include "GameManager.h"
 
 using namespace std;
 
 class Game {
 
 public:
-    Game() : tick_delta_seconds(0.25) {};
+    Game() : tick_delta_seconds(0.25), manager(GameManager(*this)) {};
 
-    explicit Game(const double tickDeltaSeconds) : tick_delta_seconds(tickDeltaSeconds) {}
+    explicit Game(const double tickDeltaSeconds) : tick_delta_seconds(tickDeltaSeconds), manager(GameManager(*this)) {};
 
 public:
     void start_simulation();
 
     void stop_simulation();
 
+    void load_buildings(const string &file_path);
 
 private:
     void start();
 
-    void update(double delta_time);
-
-protected:
+public:
     bool is_running = false;
     const double tick_delta_seconds;
+
+    GameManager manager;
 
 private:
     chrono::time_point<chrono::steady_clock> now() { return chrono::steady_clock::now(); }
