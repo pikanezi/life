@@ -1,12 +1,19 @@
 [
   {
     "id": "farm",
-    "build_effects": [
+    "buildEffects": [
       {
         "kind": "production",
         "operation": "additive",
-        "target": ["resource", "food"],
-        "magnitude": 1
+        "target": [
+          "resource", "food"
+        ],
+        "magnitude": 1,
+        "requires": [
+          {
+            "toBe": "unlocked"
+          }
+        ]
       }
     ]
   }

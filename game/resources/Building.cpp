@@ -17,7 +17,7 @@ std::unique_ptr<class Building> Building::from_json(const Json::Value &value) {
     building->id = value["id"].asString();
 
     if (value["build_effects"]) {
-        for (const auto &v: value["build_effects"]) {
+        for (const auto &v: value["buildEffects"]) {
             building->build_effects.push_back(Effect::from_json(v));
         }
     }

@@ -20,10 +20,13 @@ public:
 
     void update(double delta_time, const Game &game);
 
-    static std::unique_ptr<class Building> from_json(const Json::Value& value);
+    static std::unique_ptr<class Building> from_json(const Json::Value &value);
 
 public:
     std::string id;
+    std::vector<Effect> active_effects;
+
+private:
     std::vector<Effect> build_effects;
     std::vector<Effect> update_effects;
 };

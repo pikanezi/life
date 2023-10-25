@@ -14,7 +14,11 @@ add_executable(LifeTest main.cpp game/Game.cpp
         game/effects/Effect.cpp
         game/effects/Effect.h
         game/utils/IO.cpp
-        game/utils/IO.h)
+        game/utils/IO.h
+        game/effects/Requirement.cpp
+        game/effects/Requirement.h
+        game/effects/EffectTarget.h
+)
 
 add_library(Life SHARED library.cpp game/Game.cpp
         game/Game.h
@@ -28,6 +32,9 @@ add_library(Life SHARED library.cpp game/Game.cpp
         game/effects/Effect.h
         game/utils/IO.cpp
         game/utils/IO.h
+        game/effects/Requirement.cpp
+        game/effects/Requirement.h
+        game/effects/EffectTarget.h
 )
 
 # json_cpp library

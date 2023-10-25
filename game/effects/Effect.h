@@ -10,6 +10,9 @@
 #include <string>
 #include <json/value.h>
 
+#include "EffectTarget.h"
+
+
 enum EffectKind {
     Price,
     Production,
@@ -21,17 +24,14 @@ enum EffectOperation {
     Multiplicative,
 };
 
-enum EffectTarget {
-    Building,
-    Resource,
-};
-
 template<typename T>
 using map_of = std::map<std::string, T>;
 
 class Effect {
 public:
-    explicit Effect(EffectKind kind, EffectOperation operation, std::tuple<EffectTarget, std::string> target,
+    explicit Effect(EffectKind kind,
+                    EffectOperation operation,
+                    EffectTarget target,
                     float magnitude) : kind(kind),
                                        target(std::move(target)),
                                        operation(operation),
@@ -42,7 +42,7 @@ public:
 public:
     const EffectKind kind;
     const EffectOperation operation;
-    const std::tuple<EffectTarget, std::string> target;
+    const EffectTarget target;
     float magnitude;
 
 private:
@@ -53,11 +53,11 @@ private:
     };
 
     inline static map_of<EffectOperation> operations = {
-            {"additive", Additive},
+            {"additive",       Additive},
             {"multiplicative", Multiplicative},
     };
 
-    inline static map_of<EffectTarget> targets = {
+    inline static map_of<EffectTargetScope> targets = {
             {"building", Building},
             {"resource", Resource},
     };

@@ -14,7 +14,7 @@ public:
 public:
     const std::string id;
 
-    double amount;
+    double amount = 0;
     double limit = 0;
 };
 

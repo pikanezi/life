@@ -12,5 +12,5 @@ class Effect Effect::from_json(const Json::Value &value) {
     auto target_scope = targets[value["target"][0].asString()];
     auto target_detail = value["target"][1].asString();
 
-    return Effect(kind, operation, {target_scope, target_detail}, magnitude);
+    return Effect(kind, operation, EffectTarget{.scope =  target_scope, .target=target}, magnitude);
 }
