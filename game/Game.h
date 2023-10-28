@@ -25,6 +25,8 @@ public:
 
     void stop_simulation();
 
+    void load_resources(const string &file_path);
+
     void load_buildings(const string &file_path);
 
 private:

@@ -3,7 +3,9 @@
 //
 
 #include <fstream>
+#include <stdexcept>
 #include <fmt/core.h>
+#include <json/json.h>
 
 #include "IO.h"
 
@@ -23,4 +25,21 @@ std::string IO::read_file(const std::string_view& path) {
         }
         out.append(buf, 0, stream.gcount());
         return out;
+}
+
+Json::Value IO::read_file_as_json(const std::string_view &path) {
+    auto file_content = IO::read_file(path);
+    Json::CharReaderBuilder builder{};
+    auto reader = std::unique_ptr<Json::CharReader>(builder.newCharReader());
+    Json::Value root{};
+    std::string errors{};
+    const auto is_parsed = reader->parse(file_content.c_str(),
+                                         file_content.c_str() + file_content.length(),
+                                         &root,
+                                         &errors);
+    if (!is_parsed) {
+        throw std::runtime_error(fmt::format("could not parse file {}:", path, errors));
+    }
+
+    return root;
 }

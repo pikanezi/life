@@ -3,10 +3,10 @@
 //
 
 #include <thread>
-#include <iostream>
+#include <memory>
 #include <fstream>
+#include <iostream>
 #include <fmt/core.h>
-#include <json/json.h>
 
 #include "Game.h"
 #include "utils/IO.h"
@@ -25,25 +25,6 @@ void Game::stop_simulation() {
     is_running = false;
 }
 
-void Game::load_buildings(const std::string &file_path) {
-    auto file_content = IO::read_file(file_path);
-    Json::CharReaderBuilder builder{};
-    auto reader = std::unique_ptr<Json::CharReader>(builder.newCharReader());
-    Json::Value root{};
-    std::string errors{};
-    const auto is_parsed = reader->parse(file_content.c_str(),
-                                         file_content.c_str() + file_content.length(),
-                                         &root,
-                                         &errors);
-    if (!is_parsed) {
-        cerr << "ERROR: Could not parse! " << errors << endl;
-        return;
-    }
-    for (const auto & i : root) {
-        manager.load_building(Building::from_json(i));
-    }
-}
-
 void Game::start() {
     cout << "Game::start" << endl;
     auto prev_time = now();
@@ -54,5 +35,25 @@ void Game::start() {
         manager.update(chrono::duration<double>(current_time - prev_time).count());
         prev_time = current_time;
         this_thread::sleep_for(chrono::duration<double>(tick_delta_seconds));
+    }
+}
+
+void Game::load_resources(const std::string &file_path) {
+    auto resources = IO::read_file_as_json(file_path);
+
+    for (const auto &resource: resources) {
+        auto res = std::make_unique<class Resource>(Resource::from_json(resource));
+        cout << fmt::format("resource {} loaded", res->id) << endl;
+        manager.load_resource(std::move(res));
+    }
+}
+
+void Game::load_buildings(const std::string &file_path) {
+    const auto buildings = IO::read_file_as_json(file_path);
+
+    for (const auto &i: buildings) {
+        auto b = std::make_unique<class Building>(Building::from_json(i));
+        cout << fmt::format("building {} loaded", b->id) << endl;
+        manager.load_building(std::move(b));
     }
 }

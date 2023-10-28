@@ -10,23 +10,28 @@
 #include <vector>
 #include <json/json.h>
 
+#include "Cost.h"
 #include "../effects/Effect.h"
 
-class Game;
+class GameManager;
 
 class Building {
 public:
-    void built(const Game &game);
+    void update(double delta_time, GameManager &manager);
 
-    void update(double delta_time, const Game &game);
+    bool can_afford(const GameManager &manager) const;
 
-    static std::unique_ptr<class Building> from_json(const Json::Value &value);
+    static class Building from_json(const Json::Value &value);
 
 public:
     std::string id;
+
+    bool unlocked = false;
+    int amount_owned = 0;
+
+    std::vector<Cost> cost;
     std::vector<Effect> active_effects;
 
-private:
     std::vector<Effect> build_effects;
     std::vector<Effect> update_effects;
 };

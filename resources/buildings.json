@@ -1,13 +1,17 @@
 [
   {
     "id": "farm",
+    "unlocked": true,
+    "cost": [{"resource": "food", "amount": 10, "price_ratio": 1.25}],
     "buildEffects": [
       {
+        "kind": "unlock",
+        "target": ["resource", "food"]
+      },
+      {
         "kind": "production",
+        "target": ["resource", "food"],
         "operation": "additive",
-        "target": [
-          "resource", "food"
-        ],
         "magnitude": 1,
         "requires": [
           {

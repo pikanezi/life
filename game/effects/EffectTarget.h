@@ -13,6 +13,8 @@ enum EffectTargetScope {
 };
 
 struct EffectTarget {
+    EffectTarget(EffectTargetScope scope, std::string target) : scope(scope), target(target) {}
+
     EffectTargetScope scope;
     std::string target;
 };
