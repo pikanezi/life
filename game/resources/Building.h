@@ -5,23 +5,21 @@
 #ifndef LIFE_BUILDING_H
 #define LIFE_BUILDING_H
 
+#include <json/json.h>
 #include <memory>
 #include <string>
 #include <vector>
-#include <json/json.h>
 
-#include "Cost.h"
 #include "../effects/Effect.h"
+#include "Cost.h"
 
 class GameManager;
 
 class Building {
 public:
-    void update(double delta_time, GameManager &manager);
+    bool can_afford(GameManager const &manager) const;
 
-    bool can_afford(const GameManager &manager) const;
-
-    static class Building from_json(const Json::Value &value);
+    static class Building from_json(Json::Value const &value);
 
 public:
     std::string id;
@@ -36,4 +34,4 @@ public:
     std::vector<Effect> update_effects;
 };
 
-#endif //LIFE_BUILDING_H
+#endif//LIFE_BUILDING_H

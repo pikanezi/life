@@ -3,15 +3,22 @@
 //
 
 #include <memory>
+#include <fmt/core.h>
 
+#include "Game.h"
 #include "GameManager.h"
+#include "effects/Effect.h"
+#include "resources/Resource.h"
 
 void GameManager::update(double delta_time) {
+    for (auto &[_, building]: buildings) {
+    }
 }
 
 void GameManager::construct(const std::string &building_id) {
     const auto &building = buildings[building_id];
     if (!building->can_afford(*this)) {
+        game.logger.log(fmt::format("can't afford building {}", building_id));
         return;
     }
 
@@ -24,6 +31,7 @@ void GameManager::construct(const std::string &building_id) {
         apply_effect(effect);
     }
     building->amount_owned += 1;
+    game.logger.log(fmt::format("building {} constructed", building_id));
 }
 
 void GameManager::apply_effect(const Effect &effect) {
@@ -31,7 +39,11 @@ void GameManager::apply_effect(const Effect &effect) {
         return;
     }
     if (effect.duration != Instant) {
-        active_effects.push_back(effect);
+        if (effect.target.scope == Building) {
+            buildings[effect.target.target]->active_effects.push_back(effect);
+        } else {
+            active_effects.push_back(effect);
+        }
         return;
     }
     execute_effect(effect);
@@ -53,9 +65,9 @@ void GameManager::execute_effect(const Effect &effect) {
             switch (effect.target.scope) {
                 case Resource:
                     if (effect.operation == Additive) {
-                        resources[effect.target.target]->amount += effect.magnitude;
+                        *resources[effect.target.target] += effect.magnitude;
                     } else {
-                        resources[effect.target.target]->amount *= effect.magnitude;
+                        *resources[effect.target.target] *= effect.magnitude;
                     }
                     break;
                 case Building:

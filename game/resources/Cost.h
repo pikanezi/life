@@ -6,20 +6,20 @@
 #define LIFE_COST_H
 
 
-#include <string>
 #include <json/value.h>
+#include <string>
 
 class Cost {
 public:
     explicit Cost(double increase_ratio) : increase_ratio(increase_ratio) {}
 
-    static class Cost from_json(const Json::Value &value);
+    static class Cost from_json(Json::Value const &value);
 
 public:
     std::string resource_id;
     double amount;
-    const double increase_ratio;
+    double const increase_ratio;
 };
 
 
-#endif //LIFE_COST_H
+#endif//LIFE_COST_H

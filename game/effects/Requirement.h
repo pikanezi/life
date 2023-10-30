@@ -18,9 +18,9 @@ enum RequirementPossibility {
 
 class Requirement {
 public:
-    bool satisfied(const GameManager &manager) const;
+    bool satisfied(GameManager const &manager) const;
 
-    static class Requirement from_json(const Json::Value &value, const class Effect &owning_effect);
+    static class Requirement from_json(Json::Value const &value, class Effect const &owning_effect);
 
 public:
     EffectTarget target;
@@ -28,10 +28,9 @@ public:
 
 private:
     inline static std::map<std::string, RequirementPossibility> possibilities = {
-            {"none",     None},
-            {"unlocked", Unlocked}
-    };
+            {"none", None},
+            {"unlocked", Unlocked}};
 };
 
 
-#endif //LIFE_REQUIREMENT_H
+#endif//LIFE_REQUIREMENT_H

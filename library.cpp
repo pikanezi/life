@@ -1,7 +1,7 @@
 #include <memory>
 
-#include "library.h"
 #include "game/Game.h"
+#include "library.h"
 
 std::shared_ptr<Game> game;
 
@@ -16,6 +16,6 @@ void stop_simulation() {
     game->stop_simulation();
 }
 
-void load_buildings(const char* file_path) {
+void load_buildings(char const *file_path) {
     game->load_buildings(file_path);
 }

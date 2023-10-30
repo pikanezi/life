@@ -5,15 +5,15 @@
 #ifndef LIFE_IO_H
 #define LIFE_IO_H
 
-#include <string>
 #include <json/value.h>
+#include <string>
 
 class IO {
 public:
-    static std::string read_file(const std::string_view& path);
+    static std::string read_file(std::string_view const &path);
 
-    static Json::Value read_file_as_json(const std::string_view& path);
+    static Json::Value read_file_as_json(std::string_view const &path);
 };
 
 
-#endif //LIFE_IO_H
+#endif//LIFE_IO_H

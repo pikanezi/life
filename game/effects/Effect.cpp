@@ -4,16 +4,16 @@
 
 #include <algorithm>
 
+#include "../GameManager.h"
 #include "Effect.h"
 #include "Requirement.h"
-#include "../GameManager.h"
 
-bool Effect::can_activate(const GameManager &manager) const {
+bool Effect::can_activate(GameManager const &manager) const {
     return all_of(requirements.cbegin(), requirements.cend(),
-                  [&](const Requirement &requirement) { return requirement.satisfied(manager); });
+                  [&](Requirement const &requirement) { return requirement.satisfied(manager); });
 }
 
-class Effect Effect::from_json(const Json::Value &value) {
+class Effect Effect::from_json(Json::Value const &value) {
     auto kind = EffectMappers::kinds[value["kind"].asString()];
     auto operation = EffectMappers::operations[value["operation"].asString()];
     auto magnitude = value["magnitude"].asDouble();
@@ -25,8 +25,8 @@ class Effect Effect::from_json(const Json::Value &value) {
 
     auto effect = Effect(kind, operation, EffectTarget(target_scope, target), duration, magnitude);
     effect.interval = interval;
-    if (const auto &requirements = value["requires"]) {
-        for (const auto &requirement: requirements) {
+    if (auto const &requirements = value["requires"]) {
+        for (auto const &requirement: requirements) {
             effect.requirements.push_back(Requirement::from_json(requirement, effect));
         }
     }

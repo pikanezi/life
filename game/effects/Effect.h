@@ -5,14 +5,14 @@
 #ifndef LIFE_EFFECT_H
 #define LIFE_EFFECT_H
 
+#include <json/value.h>
 #include <map>
+#include <string>
 #include <tuple>
 #include <vector>
-#include <string>
-#include <json/value.h>
 
-#include "Requirement.h"
 #include "EffectTarget.h"
+#include "Requirement.h"
 
 enum EffectKind {
     Price,
@@ -43,44 +43,43 @@ public:
                     EffectOperation operation,
                     EffectTarget target,
                     EffectDuration duration,
-                    float magnitude) : kind(kind),
-                                       target(std::move(target)),
-                                       operation(operation),
-                                       duration(duration),
-                                       magnitude(magnitude) {}
+                    double magnitude) : kind(kind),
+                                        target(std::move(target)),
+                                        operation(operation),
+                                        duration(duration),
+                                        magnitude(magnitude) {}
 
-    bool can_activate(const GameManager &manager) const;
+    bool can_activate(GameManager const &manager) const;
 
-    static class Effect from_json(const Json::Value &value);
+    static class Effect from_json(Json::Value const &value);
 
 public:
-    const EffectKind kind;
-    const EffectDuration duration;
-    const EffectOperation operation;
-    const EffectTarget target;
+    EffectKind const kind;
+    EffectDuration const duration;
+    EffectOperation const operation;
+    EffectTarget const target;
 
     double magnitude;
     double interval;
 
     std::vector<class Requirement> requirements;
-
 };
 
 struct EffectMappers {
     inline static map_of<EffectKind> kinds = {
-            {"price",       Price},
-            {"production",  Production},
+            {"price",       Price      },
+            {"production",  Production },
             {"consumption", Consumption}
     };
 
     inline static map_of<EffectDuration> durations = {
-            {"instant", Instant},
+            {"instant",    Instant   },
             {"continuous", Continuous},
-            {"interval", Interval},
+            {"interval",   Interval  },
     };
 
     inline static map_of<EffectOperation> operations = {
-            {"additive",       Additive},
+            {"additive",       Additive      },
             {"multiplicative", Multiplicative},
     };
 
@@ -91,4 +90,4 @@ struct EffectMappers {
 };
 
 
-#endif //LIFE_EFFECT_H
+#endif//LIFE_EFFECT_H

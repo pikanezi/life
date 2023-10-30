@@ -5,13 +5,13 @@
 #ifndef LIFE_GAME_MANAGER_H
 #define LIFE_GAME_MANAGER_H
 
+#include <json/json.h>
 #include <map>
 #include <memory>
 #include <vector>
-#include <json/json.h>
 
-#include "resources/Resource.h"
 #include "resources/Building.h"
+#include "resources/Resource.h"
 
 class Game;
 
@@ -20,7 +20,7 @@ using namespace std;
 class GameManager {
 
 public:
-    explicit GameManager(const Game &game) : game(game) {}
+    explicit GameManager(Game const &game) : game(game) {}
 
     // Loading
     void load_building(unique_ptr<class Building> building);
@@ -30,27 +30,27 @@ public:
     // Runtime
     void update(double delta_time);
 
-    void construct(const std::string &building_id);
+    void construct(std::string const &building_id);
 
-    void apply_effect(const Effect &effect);
+    void apply_effect(Effect const &effect);
 
     void increment_food();
-    
-    const class Resource *resource_by_id(const string &resource_id) const;
 
-    const class Building *building_by_id(const string &building_id) const;
+    const class Resource *resource_by_id(string const &resource_id) const;
 
-    bool is_resource_unlocked(const string &resource_id) const;
+    const class Building *building_by_id(string const &building_id) const;
 
-    bool is_building_unlocked(const string &building_id) const;
+    bool is_resource_unlocked(string const &resource_id) const;
 
-    bool is_target_unlocked(const EffectTarget &target) const;
+    bool is_building_unlocked(string const &building_id) const;
 
-private:
-    void execute_effect(const Effect &effect);
+    bool is_target_unlocked(EffectTarget const &target) const;
 
 private:
-    const Game &game;
+    void execute_effect(Effect const &effect);
+
+private:
+    Game const &game;
 
     vector<class Effect> active_effects;
     map<string, unique_ptr<class Resource>> resources;
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif //LIFE_GAME_MANAGER_H
+#endif//LIFE_GAME_MANAGER_H

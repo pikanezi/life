@@ -13,11 +13,11 @@ enum EffectTargetScope {
 };
 
 struct EffectTarget {
-    EffectTarget(EffectTargetScope scope, std::string target) : scope(scope), target(target) {}
+    EffectTarget(EffectTargetScope scope, std::string target) : scope(scope), target(std::move(target)) {}
 
-    EffectTargetScope scope;
-    std::string target;
+    EffectTargetScope const scope;
+    std::string const target;
 };
 
 
-#endif //LIFE_EFFECTTARGET_H
+#endif//LIFE_EFFECTTARGET_H

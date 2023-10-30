@@ -4,7 +4,7 @@
 
 #include "Cost.h"
 
-class Cost Cost::from_json(const Json::Value &value) {
+class Cost Cost::from_json(Json::Value const &value) {
     auto increase_ratio = value["price_ratio"].asDouble();
     auto cost = Cost(increase_ratio);
     cost.amount = value["amount"].asDouble();

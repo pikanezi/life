@@ -1,14 +1,17 @@
 [
   {
-    "id": "food"
+    "id": "food",
+    "limit": 250
   },
   {
     "id": "human"
   },
   {
-    "id": "wood"
+    "id": "wood",
+    "limit": 250
   },
   {
-    "id": "stone"
+    "id": "stone",
+    "limit": 250
   }
 ]

@@ -5,19 +5,23 @@
 #ifndef LIFE_RESOURCE_H
 #define LIFE_RESOURCE_H
 
-#include <string>
 #include <json/json.h>
+#include <string>
 
 class Resource {
 public:
     explicit Resource(std::string id, bool unlocked) : id(std::move(id)), unlocked(unlocked) {}
 
-    Resource(const Resource& resource) : id(resource.id), unlocked(resource.unlocked) {}
+    Resource(Resource const &resource) : id(resource.id), unlocked(resource.unlocked) {}
 
-    static class Resource from_json(const Json::Value &value);
+    static class Resource from_json(Json::Value const &value);
+
+    void operator+=(double rhs);
+
+    void operator*=(double rhs);
 
 public:
-    const std::string id;
+    std::string const id;
 
     double amount = 0;
     double limit = 0;
@@ -25,4 +29,4 @@ public:
     bool unlocked = false;
 };
 
-#endif //LIFE_RESOURCE_H
+#endif//LIFE_RESOURCE_H
