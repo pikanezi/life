@@ -1,6 +1,7 @@
 [
   {
     "id": "food",
+    "unlocked": true,
     "limit": 250
   },
   {

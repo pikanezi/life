@@ -2,54 +2,62 @@
 // Created by Vincent Neel on 18/10/2023.
 //
 
-#include <memory>
 #include <fmt/core.h>
+#include <memory>
 
 #include "Game.h"
 #include "GameManager.h"
 #include "effects/Effect.h"
+#include "resources/Building.h"
 #include "resources/Resource.h"
 
 void GameManager::update(double delta_time) {
-    for (auto &[_, building]: buildings) {
+    for (auto const &[_, building]: buildings) {
+        if (!building->unlocked) {
+            continue;
+        }
+        for (auto const &effect: building->active_effects) {
+            execute_duration_effect(effect, delta_time);
+        }
     }
 }
 
-void GameManager::construct(const std::string &building_id) {
-    const auto &building = buildings[building_id];
+void GameManager::construct(std::string const &building_id) {
+    auto const &building = buildings[building_id];
     if (!building->can_afford(*this)) {
-        game.logger.log(fmt::format("can't afford building {}", building_id));
+        game.logger.log(fmt::format("GameManager::construct: can't afford building {}", building_id));
         return;
     }
 
-    EffectTarget target = EffectTarget(Building, building_id);
-    for (const auto &c: building->cost) {
-        const auto cost_effect = Effect(Consumption, Additive, target, Instant, -c.amount);
+    auto const sender = EffectTarget(Building, building_id);
+    for (auto const &c: building->cost) {
+        auto const cost_effect = Effect(Consumption, Additive, sender, EffectTarget(Resource, c.resource_id), Instant, -c.amount);
         apply_effect(cost_effect);
     }
-    for (const auto &effect: building->build_effects) {
+    for (auto const &effect: building->build_effects) {
         apply_effect(effect);
     }
-    building->amount_owned += 1;
+    // add a new building
+    apply_effect(Effect(Consumption, Additive, sender, EffectTarget(Building, building_id), Instant, 1));
     game.logger.log(fmt::format("building {} constructed", building_id));
 }
 
-void GameManager::apply_effect(const Effect &effect) {
+void GameManager::apply_effect(Effect const &effect) {
     if (!effect.can_activate(*this)) {
         return;
     }
     if (effect.duration != Instant) {
-        if (effect.target.scope == Building) {
-            buildings[effect.target.target]->active_effects.push_back(effect);
+        if (effect.sender.scope == Building) {
+            buildings[effect.sender.target]->active_effects.push_back(effect);
         } else {
             active_effects.push_back(effect);
         }
         return;
     }
-    execute_effect(effect);
+    execute_instant_effect(effect);
 }
 
-void GameManager::execute_effect(const Effect &effect) {
+void GameManager::execute_instant_effect(Effect const &effect) {
     switch (effect.kind) {
         case Unlock:
             switch (effect.target.scope) {
@@ -57,44 +65,78 @@ void GameManager::execute_effect(const Effect &effect) {
                     buildings[effect.target.target]->unlocked = true;
                 case Resource:
                     resources[effect.target.target]->unlocked = true;
+                default:
+                    break;
             }
             break;
         case Price:
         case Production:
         case Consumption:
             switch (effect.target.scope) {
-                case Resource:
+                case Resource: {
+                    auto const &resource = resources[effect.target.target];
+                    if (!resource->unlocked) {
+                        game.logger.log(fmt::format("GameManager::execute_instant_effect: resource {} locked", effect.target.target));
+                        return;
+                    }
                     if (effect.operation == Additive) {
-                        *resources[effect.target.target] += effect.magnitude;
+                        *resource += effect.magnitude;
                     } else {
-                        *resources[effect.target.target] *= effect.magnitude;
+                        *resource *= effect.magnitude;
                     }
                     break;
-                case Building:
-                    if (effect.operation == Additive) {
-                        buildings[effect.target.target]->amount_owned += int(effect.magnitude);
-                    } else {
-                        buildings[effect.target.target]->amount_owned *= int(effect.magnitude);
+                }
+                case Building: {
+                    auto const &building = buildings[effect.target.target];
+                    if (!building->unlocked) {
+                        game.logger.log(fmt::format("GameManager::execute_instant_effect: building {} locked", effect.target.target));
+                        return;
                     }
+                    if (effect.operation == Additive) {
+                        building->amount_owned += int(effect.magnitude);
+                    } else {
+                        building->amount_owned *= int(effect.magnitude);
+                    }
+                    break;
+                }
+                default:
                     break;
             }
             break;
     }
 }
 
-const class Resource *GameManager::resource_by_id(const string &resource_id) const {
+void GameManager::execute_duration_effect(Effect const &effect, double delta_time) {
+    switch (effect.kind) {
+        case Price:
+        case Production:
+        case Consumption:
+            if (effect.target.scope == Resource) {
+                if (effect.operation == Additive) {
+                    *resources[effect.target.target] += effect.magnitude * delta_time;
+                } else {
+                    *resources[effect.target.target] *= effect.magnitude * delta_time;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+const class Resource *GameManager::resource_by_id(string const &resource_id) const {
     return resources.at(resource_id).get();
 }
 
-const class Building *GameManager::building_by_id(const std::string &building_id) const {
+const class Building *GameManager::building_by_id(std::string const &building_id) const {
     return buildings.at(building_id).get();
 }
 
-bool GameManager::is_resource_unlocked(const string &resource_id) const {
+bool GameManager::is_resource_unlocked(string const &resource_id) const {
     return resources.contains(resource_id);
 }
 
-bool GameManager::is_building_unlocked(const std::string &building_id) const {
+bool GameManager::is_building_unlocked(std::string const &building_id) const {
     return buildings.contains(building_id);
 }
 
@@ -106,17 +148,19 @@ void GameManager::load_resource(unique_ptr<class Resource> resource) {
     resources[resource->id] = std::move(resource);
 }
 
-bool GameManager::is_target_unlocked(const EffectTarget &target) const {
+bool GameManager::is_target_unlocked(EffectTarget const &target) const {
     switch (target.scope) {
         case Resource:
             is_resource_unlocked(target.target);
         case Building:
             is_building_unlocked(target.target);
+        default:
+            break;
     }
     return false;
 }
 
 void GameManager::increment_food() {
-    const auto add_food_effect = Effect(Consumption, Additive, EffectTarget(Resource, "food"), Instant, 1.f);
+    auto const add_food_effect = Effect(Consumption, Additive, EffectTarget::global(), EffectTarget(Resource, "food"), Instant, 1.f);
     apply_effect(add_food_effect);
 }

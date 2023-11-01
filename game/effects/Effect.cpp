@@ -17,13 +17,14 @@ class Effect Effect::from_json(Json::Value const &value) {
     auto kind = EffectMappers::kinds[value["kind"].asString()];
     auto operation = EffectMappers::operations[value["operation"].asString()];
     auto magnitude = value["magnitude"].asDouble();
-    auto target = value["target"][0].asString();
     auto target_scope = EffectMappers::targets[value["target"][0].asString()];
     auto target_detail = value["target"][1].asString();
+    auto sender_scope = EffectMappers::targets[value["sender"][0].asString()];
+    auto sender_detail = value["sender"][1].asString();
     auto duration = value["duration"] ? EffectMappers::durations[value["duration"].asString()] : Instant;
     auto interval = value["durationInterval"].asDouble();
 
-    auto effect = Effect(kind, operation, EffectTarget(target_scope, target), duration, magnitude);
+    auto effect = Effect(kind, operation, EffectTarget(sender_scope, sender_detail), EffectTarget(target_scope, target_detail), duration, magnitude);
     effect.interval = interval;
     if (auto const &requirements = value["requires"]) {
         for (auto const &requirement: requirements) {
@@ -32,4 +33,11 @@ class Effect Effect::from_json(Json::Value const &value) {
     }
 
     return effect;
+}
+
+Effect Effect::from_effect(Effect const &effect, EffectTarget const &sender) {
+    auto new_effect = Effect(effect.kind, effect.operation, sender, effect.target, effect.duration, effect.magnitude);
+    new_effect.interval = effect.interval;
+
+    return new_effect;
 }

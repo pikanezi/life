@@ -8,6 +8,7 @@
 #include <string>
 
 enum EffectTargetScope {
+    Global,
     Building,
     Resource,
 };
@@ -17,6 +18,8 @@ struct EffectTarget {
 
     EffectTargetScope const scope;
     std::string const target;
+
+    inline static EffectTarget global() { return {Global, ""}; }
 };
 
 

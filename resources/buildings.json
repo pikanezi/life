@@ -5,11 +5,8 @@
     "cost": [{"resource": "food", "amount": 10, "price_ratio": 1.25}],
     "buildEffects": [
       {
-        "kind": "unlock",
-        "target": ["resource", "food"]
-      },
-      {
         "kind": "production",
+        "duration": "infinite",
         "target": ["resource", "food"],
         "operation": "additive",
         "magnitude": 1,

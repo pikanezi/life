@@ -24,14 +24,15 @@ class Building Building::from_json(Json::Value const &value) {
             building.cost.push_back(Cost::from_json(v));
         }
     }
-    if (value["build_effects"]) {
+    auto const sender = EffectTarget(EffectTargetScope::Building, building.id);
+    if (value["buildEffects"]) {
         for (auto const &v: value["buildEffects"]) {
-            building.build_effects.push_back(Effect::from_json(v));
+            building.build_effects.push_back(Effect::from_effect(Effect::from_json(v), sender));
         }
     }
-    if (value["update_effects"]) {
-        for (auto const &v: value["update_effects"]) {
-            building.update_effects.push_back(Effect::from_json(v));
+    if (value["updateEffects"]) {
+        for (auto const &v: value["updateEffects"]) {
+            building.update_effects.push_back(Effect::from_effect(Effect::from_json(v), sender));
         }
     }
     return building;

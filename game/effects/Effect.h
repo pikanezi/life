@@ -24,7 +24,7 @@ enum EffectKind {
 enum EffectDuration {
     Instant,
     Interval,
-    Continuous,
+    Infinite,
 };
 
 enum EffectOperation {
@@ -41,9 +41,11 @@ class Effect {
 public:
     explicit Effect(EffectKind kind,
                     EffectOperation operation,
+                    EffectTarget sender,
                     EffectTarget target,
                     EffectDuration duration,
                     double magnitude) : kind(kind),
+                                        sender(std::move(sender)),
                                         target(std::move(target)),
                                         operation(operation),
                                         duration(duration),
@@ -51,12 +53,14 @@ public:
 
     bool can_activate(GameManager const &manager) const;
 
-    static class Effect from_json(Json::Value const &value);
+    static Effect from_json(Json::Value const &value);
+    static Effect from_effect(Effect const &effect, EffectTarget const &sender);
 
 public:
     EffectKind const kind;
     EffectDuration const duration;
     EffectOperation const operation;
+    EffectTarget const sender;
     EffectTarget const target;
 
     double magnitude;
@@ -67,15 +71,16 @@ public:
 
 struct EffectMappers {
     inline static map_of<EffectKind> kinds = {
+            {"unlock",      Unlock     },
             {"price",       Price      },
             {"production",  Production },
             {"consumption", Consumption}
     };
 
     inline static map_of<EffectDuration> durations = {
-            {"instant",    Instant   },
-            {"continuous", Continuous},
-            {"interval",   Interval  },
+            {"instant",  Instant },
+            {"infinite", Infinite},
+            {"interval", Interval},
     };
 
     inline static map_of<EffectOperation> operations = {
